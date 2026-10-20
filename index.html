@@ -323,10 +323,22 @@
     .pairs-chip:hover,.pairs-chip:focus-visible{background:rgba(242,189,62,.1);color:var(--gold)}
     @media(max-width:500px){.pairs-row{gap:8px}.pairs-label{flex-basis:100%}}
     @media(prefers-reduced-motion:reduce){.pairs-chip{transition:none!important}}
+    /* Announcement bar: slim black-and-gold strip above the header on every view, dismissible for the session */
+    .announce-bar{position:relative;z-index:6;background:#000;border-bottom:1px solid var(--gold);color:var(--gold)}
+    .announce-inner{display:flex;align-items:center;justify-content:center;gap:6px 18px;min-height:44px;padding:7px 56px 7px 24px}
+    .announce-text{margin:0;font-size:.8rem;font-weight:600;letter-spacing:.05em;text-align:center}
+    .announce-cta{color:var(--gold);font-size:.8rem;font-weight:800;letter-spacing:.05em;text-decoration:none;border-bottom:1px solid rgba(242,189,62,.55);padding-bottom:1px;white-space:nowrap;transition:color .2s ease,border-color .2s ease}
+    .announce-cta:hover,.announce-cta:focus-visible{color:#ffd970;border-bottom-color:var(--gold)}
+    .announce-close{position:absolute;top:50%;right:8px;transform:translateY(-50%);display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;padding:0;border:0;background:transparent;color:var(--gold);font-size:1.3rem;line-height:1;cursor:pointer}
+    .announce-close:hover,.announce-close:focus-visible{color:#ffd970}
+    .announce-bar[hidden]{display:none}
+    @media(max-width:500px){.announce-inner{flex-wrap:wrap;gap:1px 12px;padding:8px 56px 8px 16px}.announce-text,.announce-cta{font-size:.76rem}}
+    @media(prefers-reduced-motion:reduce){.announce-cta{transition:none!important}}
   </style>
 </head>
 <body>
   <div class="scroll-progress" id="scroll-progress" aria-hidden="true"></div>
+  <div class="announce-bar" id="announce-bar" role="region" aria-label="Announcement"><div class="announce-inner"><p class="announce-text">Now accepting new projects</p><a class="announce-cta" href="https://wa.me/17252248567?text=Hello%20Bin%20Asif%20Enterprises%2C%20I%27d%20like%20to%20discuss%20a%20project." target="_blank" rel="noopener">Start yours on WhatsApp <span aria-hidden="true">→</span></a></div><button class="announce-close" id="announce-close" type="button" aria-label="Dismiss announcement">×</button></div>
   <header class="site-head"><div class="wrap head-row head-default"><div class="signal">Independent creative agency · Since 2024</div><nav aria-label="Main navigation"><a href="#services">Services</a><a href="#portfolio" data-page="portfolio">Portfolio</a><a href="#why-us">Why us</a><a href="#approach">Process</a><a href="#faq">FAQ</a><a href="#contact">Contact</a></nav></div><div class="wrap head-row route-head"><button class="route-back" type="button" data-route-back><span aria-hidden="true">←</span> <span class="route-back-label">Back to services</span></button><span class="route-title">Service detail</span></div></header>
   <main>
     <div class="wrap hero">
@@ -544,6 +556,9 @@
         if(location.hash==='#services'||location.hash==='#selected-work') requestAnimationFrame(function(){var t=document.getElementById(location.hash.slice(1));if(t)t.scrollIntoView();});
       });
       var initial=location.hash.match(/^#service\/(.+)$/); if(initial&&serviceData[initial[1]]) openService(initial[1],false); else if(location.hash==='#portfolio') openPortfolio(false); else if(/^#pf-/.test(location.hash)) openPortfolio(false, true);
+
+      var announceBar=document.getElementById('announce-bar'), announceClose=document.getElementById('announce-close');
+      if (announceBar && announceClose) announceClose.addEventListener('click', function () { announceBar.hidden = true; });
 
       var brief={service:'',goal:''}, summary=document.getElementById('brief-summary-text'), error=document.getElementById('brief-error');
       document.querySelectorAll('[data-choice-group] .choice').forEach(function(btn){btn.addEventListener('click',function(){var group=btn.parentElement.getAttribute('data-choice-group');btn.parentElement.querySelectorAll('.choice').forEach(function(b){b.classList.remove('is-selected');});btn.classList.add('is-selected');brief[group]=btn.getAttribute('data-value');summary.textContent=(brief.service||'Choose a service')+' · '+(brief.goal||'Choose a goal');error.textContent='';});});
