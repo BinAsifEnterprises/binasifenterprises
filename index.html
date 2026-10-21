@@ -486,6 +486,28 @@
     .footer-column .footer-socials{margin-top:22px}
     @media(max-width:860px){.contact-cards{grid-template-columns:1fr 1fr}}
     @media(max-width:500px){.contact-cards{grid-template-columns:1fr}.contact-card{padding:22px 20px}}
+    /* Exit-intent popup: a centered black-and-gold card over a dimmed backdrop.
+       Shown by script only on fine-pointer devices, once per session. It never
+       locks scroll, never traps focus, and sits clear of the fixed header,
+       announcement bar, floating buttons and cookie banner (z-index 90, below
+       the preloader's 200). Fixed positioning means no layout shift. */
+    .exit-popup{position:fixed;inset:0;z-index:90;display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;visibility:hidden;transition:opacity .3s ease,visibility .3s ease}
+    .exit-popup[hidden]{display:none}
+    .exit-popup.is-shown{opacity:1;visibility:visible}
+    .exit-popup-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.74)}
+    .exit-popup-card{position:relative;width:min(480px,100%);padding:46px 42px 36px;background:#0a0a0a;border:1px solid var(--gold);box-shadow:0 34px 90px rgba(0,0,0,.62);transform:translateY(14px);transition:transform .3s ease}
+    .exit-popup.is-shown .exit-popup-card{transform:none}
+    .exit-popup-card::before{content:"";position:absolute;left:0;top:0;width:100%;height:3px;background:linear-gradient(90deg,var(--gold),rgba(242,189,62,.12) 72%,transparent)}
+    .exit-popup-card h2{margin:0 40px 14px 0;font-family:"Playfair Display",serif;font-size:clamp(1.9rem,4vw,2.45rem);line-height:1.05;letter-spacing:-.02em}
+    .exit-popup-card p{margin:0 0 26px;color:var(--muted);font-size:.98rem;line-height:1.6}
+    .exit-popup-close{position:absolute;top:8px;right:8px;width:44px;height:44px;display:inline-flex;align-items:center;justify-content:center;padding:0;border:0;background:transparent;color:var(--muted);font-size:1.65rem;line-height:1;cursor:pointer;transition:color .2s ease}
+    .exit-popup-close:hover,.exit-popup-close:focus-visible{color:var(--gold)}
+    .exit-popup-download{width:100%}
+    .exit-popup-wa{display:block;margin-top:18px;color:var(--ink);font-size:.88rem;font-weight:600;text-align:center;text-decoration:underline;text-decoration-color:var(--gold);text-underline-offset:5px}
+    .exit-popup-wa:hover,.exit-popup-wa:focus-visible{color:var(--gold)}
+    .exit-popup-dismiss{display:block;margin:12px auto 0;padding:8px 12px;border:0;background:transparent;color:var(--muted);font:inherit;font-size:.82rem;cursor:pointer;text-decoration:underline;text-underline-offset:4px;transition:color .2s ease}
+    .exit-popup-dismiss:hover,.exit-popup-dismiss:focus-visible{color:var(--ink)}
+    @media(prefers-reduced-motion:reduce){.exit-popup,.exit-popup-card,.exit-popup-close,.exit-popup-dismiss{transition:none}.exit-popup-card{transform:none}}
   </style>
 </head>
 <body>
@@ -669,6 +691,17 @@
   <button type="button" class="back-to-top" id="back-to-top" aria-label="Back to top"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 20V5M5.5 11.5 12 5l6.5 6.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
   <nav class="mobile-action-bar" id="mobile-action-bar" aria-label="Quick contact actions"><a class="mab-btn mab-whatsapp" href="https://wa.me/17252248567?text=Hello%20Bin%20Asif%20Enterprises%2C%20I%27d%20like%20to%20discuss%20a%20project." target="_blank" rel="noopener" aria-label="Chat with Bin Asif Enterprises on WhatsApp"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20.5 11.6a8.5 8.5 0 0 1-12.6 7.5L3 20.5l1.4-4.7A8.5 8.5 0 1 1 20.5 11.6Z" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M8.2 7.6c.2-.4.4-.4.8-.4h.5l1 2.4c.1.3.1.5-.1.7l-.8 1c.9 1.8 2.1 3 3.9 3.9l1-.8c.2-.2.5-.2.7-.1l2.3 1.1c.3.1.4.4.3.7-.2.9-1.1 1.7-2 1.9-1.3.2-3.4-.6-5.4-2.1-2.3-1.8-4.1-4.5-4.1-6.4 0-.7.9-1.9 1.9-1.9Z" fill="currentColor"/></svg><span>WhatsApp us</span></a><a class="mab-btn mab-call" href="tel:+17252248567" aria-label="Call Bin Asif Enterprises now"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5.2 3.5h3.4a1 1 0 0 1 1 .7l1.2 4a1 1 0 0 1-.3 1L8.6 10.8a13.6 13.6 0 0 0 4.6 4.6l1.6-1.9a1 1 0 0 1 1-.3l4 1.2a1 1 0 0 1 .7 1v3.4a1.7 1.7 0 0 1-1.8 1.7C10.4 19.7 4.3 13.6 3.5 5.3a1.7 1.7 0 0 1 1.7-1.8Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg><span>Call now</span></a></nav>
   <div class="cookie-banner" id="cookie-banner" role="region" aria-label="Cookie notice"><p>This site uses only the cookies it needs to work — nothing more.</p><button type="button" class="cookie-ok" id="cookie-ok">Got it</button></div>
+  <div class="exit-popup" id="exit-popup" role="dialog" aria-labelledby="exit-popup-title" aria-hidden="true" hidden>
+    <div class="exit-popup-backdrop" data-exit-close aria-hidden="true"></div>
+    <div class="exit-popup-card">
+      <button type="button" class="exit-popup-close" id="exit-popup-close" aria-label="Close popup">×</button>
+      <h2 id="exit-popup-title">Before you go…</h2>
+      <p>Take our free PDF with you: 50 AI Prompts for Social Media — practical prompts for hooks, captions, reels and ads.</p>
+      <a class="button exit-popup-download" id="exit-popup-download" href="assets/50-ai-prompts-social-media.pdf" download>Download the free PDF <span aria-hidden="true">→</span></a>
+      <a class="exit-popup-wa" href="https://wa.me/17252248567?text=Hello%20Bin%20Asif%20Enterprises%2C%20I%27d%20like%20to%20discuss%20a%20project." target="_blank" rel="noopener">or chat with us on WhatsApp</a>
+      <button type="button" class="exit-popup-dismiss" id="exit-popup-dismiss">No thanks</button>
+    </div>
+  </div>
   <script>
     (function () {
       var serviceData = {
@@ -779,6 +812,61 @@
           try { localStorage.setItem('bae-cookie-consent', 'got-it'); } catch (err) {}
           cookieBanner.classList.remove('is-shown');
         });
+      }
+
+      /* Exit-intent popup: fine-pointer devices only (never phones/tablets),
+         only when the mouse leaves through the top of the window, only after
+         10 seconds on the page, and only once per browser session. It never
+         appears while the preloader or the cookie banner is showing, and it
+         neither locks scroll nor traps focus. */
+      var exitPopup=document.getElementById('exit-popup');
+      if (exitPopup && window.matchMedia('(pointer: fine)').matches) {
+        var exitSeen=false;
+        try { exitSeen=sessionStorage.getItem('bae-exit-popup')==='seen'; } catch (err) { exitSeen=false; }
+        if (!exitSeen) {
+          var exitStart=Date.now(), exitShown=false, exitLastFocus=null;
+          var exitCloseBtn=document.getElementById('exit-popup-close');
+          var exitDismiss=document.getElementById('exit-popup-dismiss');
+          var exitDownload=document.getElementById('exit-popup-download');
+          function markExitSeen(){ try { sessionStorage.setItem('bae-exit-popup','seen'); } catch (err) {} }
+          function closeExitPopup(){
+            if (!exitShown) return;
+            exitShown=false;
+            exitPopup.classList.remove('is-shown');
+            exitPopup.setAttribute('aria-hidden','true');
+            setTimeout(function(){ exitPopup.hidden=true; }, 320);
+            if (exitLastFocus && exitLastFocus.focus) { try { exitLastFocus.focus({preventScroll:true}); } catch (err) {} }
+          }
+          function showExitPopup(){
+            if (exitShown) return;
+            var pre=document.getElementById('preloader');
+            if (pre && !pre.classList.contains('is-done')) return;
+            if (cookieBanner && cookieBanner.classList.contains('is-shown')) return;
+            exitShown=true; markExitSeen();
+            document.removeEventListener('mouseout', onExitIntent);
+            exitLastFocus=document.activeElement;
+            exitPopup.hidden=false;
+            requestAnimationFrame(function(){
+              exitPopup.classList.add('is-shown');
+              exitPopup.setAttribute('aria-hidden','false');
+              if (exitCloseBtn) { try { exitCloseBtn.focus({preventScroll:true}); } catch (err) {} }
+            });
+          }
+          function onExitIntent(e){
+            if (e.relatedTarget || e.clientY>8) return;
+            if (Date.now()-exitStart<10000) return;
+            showExitPopup();
+          }
+          document.addEventListener('mouseout', onExitIntent);
+          if (exitCloseBtn) exitCloseBtn.addEventListener('click', closeExitPopup);
+          if (exitDismiss) exitDismiss.addEventListener('click', closeExitPopup);
+          var exitBackdrop=exitPopup.querySelector('.exit-popup-backdrop');
+          if (exitBackdrop) exitBackdrop.addEventListener('click', closeExitPopup);
+          if (exitDownload) exitDownload.addEventListener('click', function(){ markExitSeen(); closeExitPopup(); });
+          document.addEventListener('keydown', function(e){
+            if (exitShown && (e.key==='Escape' || e.key==='Esc')) closeExitPopup();
+          });
+        }
       }
 
       var brief={service:'',goal:''}, summary=document.getElementById('brief-summary-text'), error=document.getElementById('brief-error');
