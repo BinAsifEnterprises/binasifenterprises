@@ -367,6 +367,14 @@
     @media(min-width:861px){.package-card.featured{transform:translateY(-12px)}}
     @media(max-width:860px){.packages-grid{grid-template-columns:1fr;gap:24px}}
     @media(prefers-reduced-motion:reduce){.industry-card{transition:none!important}}
+    /* Back to top: circular black-and-gold control stacked above the WhatsApp float */
+    .back-to-top{position:fixed;right:22px;bottom:88px;z-index:19;width:48px;height:48px;padding:0;border-radius:50%;border:1px solid var(--gold);background:#050505;color:var(--gold);display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 14px 32px rgba(0,0,0,.5);opacity:0;visibility:hidden;pointer-events:none;transform:translateY(12px);transition:opacity .35s ease,transform .35s ease,visibility .35s,background-color .2s ease,color .2s ease}
+    .back-to-top svg{width:20px;height:20px;flex:0 0 auto}
+    .back-to-top.is-visible{opacity:1;visibility:visible;pointer-events:auto;transform:none}
+    .back-to-top:hover{background:var(--gold);color:#080706}
+    .back-to-top:focus-visible{opacity:1;visibility:visible;pointer-events:auto;transform:none;outline:2px solid var(--gold);outline-offset:3px}
+    @media(max-width:500px){.back-to-top{bottom:76px}}
+    @media(prefers-reduced-motion:reduce){.back-to-top{transition:none}}
   </style>
 </head>
 <body>
@@ -532,6 +540,7 @@
     </div>
   </footer>
   <a class="whatsapp-float" href="https://wa.me/17252248567?text=Hello%20Bin%20Asif%20Enterprises%2C%20I%27d%20like%20to%20discuss%20a%20project." target="_blank" rel="noopener" aria-label="Chat with Bin Asif Enterprises on WhatsApp"><span class="whatsapp-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M20.5 11.6a8.5 8.5 0 0 1-12.6 7.5L3 20.5l1.4-4.7A8.5 8.5 0 1 1 20.5 11.6Z" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M8.2 7.6c.2-.4.4-.4.8-.4h.5l1 2.4c.1.3.1.5-.1.7l-.8 1c.9 1.8 2.1 3 3.9 3.9l1-.8c.2-.2.5-.2.7-.1l2.3 1.1c.3.1.4.4.3.7-.2.9-1.1 1.7-2 1.9-1.3.2-3.4-.6-5.4-2.1-2.3-1.8-4.1-4.5-4.1-6.4 0-.7.9-1.9 1.9-1.9Z" fill="currentColor"/></svg></span><span>Chat with us</span></a>
+  <button type="button" class="back-to-top" id="back-to-top" aria-label="Back to top"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 20V5M5.5 11.5 12 5l6.5 6.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
   <script>
     (function () {
       var serviceData = {
@@ -601,6 +610,17 @@
       document.querySelectorAll('[data-choice-group] .choice').forEach(function(btn){btn.addEventListener('click',function(){var group=btn.parentElement.getAttribute('data-choice-group');btn.parentElement.querySelectorAll('.choice').forEach(function(b){b.classList.remove('is-selected');});btn.classList.add('is-selected');brief[group]=btn.getAttribute('data-value');summary.textContent=(brief.service||'Choose a service')+' · '+(brief.goal||'Choose a goal');error.textContent='';});});
       var send=document.getElementById('brief-send'); if(send) send.addEventListener('click',function(){if(!brief.service||!brief.goal){error.textContent='Choose one service and one goal first.';return;}var note=document.getElementById('brief-note').value.trim();var text='Hello Bin Asif Enterprises, I would like to discuss a project.\n\nService: '+brief.service+'\nGoal: '+brief.goal+(note?'\nDetail: '+note:'');window.open('https://wa.me/17252248567?text='+encodeURIComponent(text),'_blank','noopener');});
       var progress=document.getElementById('scroll-progress');function updateProgress(){var max=document.documentElement.scrollHeight-innerHeight;progress.style.transform='scaleX('+(max>0?scrollY/max:0)+')';}addEventListener('scroll',updateProgress,{passive:true});updateProgress();
+      var backToTop=document.getElementById('back-to-top');
+      if (backToTop) {
+        var reduceMotion=window.matchMedia('(prefers-reduced-motion: reduce)');
+        function updateBackToTop(){ backToTop.classList.toggle('is-visible', window.scrollY>600); }
+        addEventListener('scroll', updateBackToTop, {passive:true});
+        updateBackToTop();
+        backToTop.addEventListener('click', function () {
+          if (reduceMotion.matches) { window.scrollTo(0,0); }
+          else { window.scrollTo({top:0, behavior:'smooth'}); }
+        });
+      }
     }());
     (function () {
       if (!('IntersectionObserver' in window) || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
