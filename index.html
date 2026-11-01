@@ -410,6 +410,13 @@
     .back-to-top:focus-visible{opacity:1;visibility:visible;pointer-events:auto;transform:none;outline:2px solid var(--gold);outline-offset:3px}
     @media(max-width:500px){.back-to-top{bottom:76px}}
     @media(prefers-reduced-motion:reduce){.back-to-top{transition:none}}
+    /* Touch devices: there is no hover, so the button's visibility must come
+       only from the scroll trigger (.is-visible), exactly as on desktop —
+       never from :hover — and the control stays a clear, easy tap target. */
+    @media(hover:none),(pointer:coarse){
+      .back-to-top{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+      .back-to-top.is-visible{opacity:1;visibility:visible;pointer-events:auto;transform:none}
+    }
     /* Sticky mobile action bar: phone-only quick contact pinned to the bottom edge.
        Hidden on desktop, where the header CTA and floating WhatsApp button already exist.
        On mobile it replaces the floating WhatsApp pill (so the two never overlap) and
@@ -1551,8 +1558,9 @@
       var mobileBar=document.getElementById('mobile-action-bar');
       if (backToTop) {
         var reduceMotion=window.matchMedia('(prefers-reduced-motion: reduce)');
-        function updateBackToTop(){ var past=window.scrollY>600; backToTop.classList.toggle('is-visible', past); if (mobileBar) mobileBar.classList.toggle('is-hidden', past); }
+        function updateBackToTop(){ var past=(window.scrollY||document.documentElement.scrollTop||document.body.scrollTop||0)>600; backToTop.classList.toggle('is-visible', past); if (mobileBar) mobileBar.classList.toggle('is-hidden', past); }
         addEventListener('scroll', updateBackToTop, {passive:true});
+        document.addEventListener('scroll', updateBackToTop, {passive:true});
         updateBackToTop();
         backToTop.addEventListener('click', function () {
           if (reduceMotion.matches) { window.scrollTo(0,0); }
