@@ -676,9 +676,9 @@
       .whatsapp-float{display:flex!important;right:16px;bottom:calc(56px + env(safe-area-inset-bottom) + 12px);transition:background-color .2s ease,color .2s ease,transform .2s ease,bottom .35s ease}
       .back-to-top{bottom:calc(56px + env(safe-area-inset-bottom) + 12px + 50px + 14px)}
       .wa-panel{right:16px;bottom:calc(56px + env(safe-area-inset-bottom) + 12px + 50px + 12px);width:min(330px,calc(100vw - 32px));max-height:calc(100vh - 240px);transition:opacity .25s ease,transform .25s ease,visibility .25s ease,bottom .35s ease}
-      body.cookie-up .whatsapp-float{bottom:calc(56px + env(safe-area-inset-bottom) + 12px + 84px + 10px)}
-      body.cookie-up .back-to-top{bottom:calc(56px + env(safe-area-inset-bottom) + 12px + 84px + 10px + 50px + 14px)}
-      body.cookie-up .wa-panel{bottom:calc(56px + env(safe-area-inset-bottom) + 12px + 84px + 10px + 50px + 12px)}
+      body.cookie-up .whatsapp-float{bottom:calc(56px + env(safe-area-inset-bottom) + 12px + var(--cookie-lift,84px) + 10px)}
+      body.cookie-up .back-to-top{bottom:calc(56px + env(safe-area-inset-bottom) + 12px + var(--cookie-lift,84px) + 10px + 50px + 14px)}
+      body.cookie-up .wa-panel{bottom:calc(56px + env(safe-area-inset-bottom) + 12px + var(--cookie-lift,84px) + 10px + 50px + 12px);max-height:calc(100vh - 156px - var(--cookie-lift,84px))}
     }
     @media(prefers-reduced-motion:reduce){.wa-panel,.wa-panel-close,.wa-action,.wa-action span,.wa-panel-plain{transition:none}}
     /* Light / dark theme toggle: dark (the original black-and-gold) stays the
@@ -2463,15 +2463,54 @@ html.reduce-motion .w2-split-word{opacity:1;transform:none;transition:none}
       });
       window.addEventListener('hashchange', function () { if (waOpen) setWaPanel(false, false); });
       /* On phones the launcher stack lifts clear while the cookie banner is
-         showing, so the two never overlap (CSS handles body.cookie-up). */
+         showing, so the two never overlap. The lift is the banner's actual
+         rendered height, measured here and exposed as --cookie-lift, plus
+         the 10px gap already in the CSS calc; the CSS keeps a fixed 84px
+         lift as a fallback whenever no measurement is available. When the
+         banner is dismissed the property is removed and the class drops,
+         so the float, back-to-top button and panel return exactly to
+         their normal positions. Desktop is unaffected: the cookie-up
+         offsets only exist inside the max-width:860px media query. */
       var cookieBanner = document.getElementById('cookie-banner');
       function syncCookieLift() {
-        document.body.classList.toggle('cookie-up', !!(cookieBanner && cookieBanner.classList.contains('is-shown')));
+        var shown = !!(cookieBanner && cookieBanner.classList.contains('is-shown'));
+        document.body.classList.toggle('cookie-up', shown);
+        if (!shown) {
+          document.documentElement.style.removeProperty('--cookie-lift');
+          return;
+        }
+        var h = 0;
+        try {
+          var rect = cookieBanner.getBoundingClientRect();
+          h = rect && rect.height ? rect.height : (cookieBanner.offsetHeight || 0);
+        } catch (err) { h = 0; }
+        if (h && isFinite(h) && h > 0) {
+          document.documentElement.style.setProperty('--cookie-lift', Math.ceil(h) + 'px');
+        } else {
+          /* Measurement unavailable: drop the property so the CSS
+             var(--cookie-lift,84px) fallback applies. */
+          document.documentElement.style.removeProperty('--cookie-lift');
+        }
       }
       if (cookieBanner && window.MutationObserver) {
         new MutationObserver(syncCookieLift).observe(cookieBanner, { attributes: true, attributeFilter: ['class'] });
       }
+      if (cookieBanner && window.ResizeObserver) {
+        try { new ResizeObserver(syncCookieLift).observe(cookieBanner); } catch (err) {}
+      }
+      window.addEventListener('resize', syncCookieLift, { passive: true });
+      window.addEventListener('orientationchange', syncCookieLift, { passive: true });
+      if (document.fonts && document.fonts.ready && document.fonts.ready.then) {
+        document.fonts.ready.then(function () { syncCookieLift(); });
+      }
       syncCookieLift();
+      /* The banner is revealed ~1.5s after load (see the consent script);
+         the MutationObserver catches that class change, but re-measure on
+         the next frame as well so a just-wrapped height is never stale. */
+      if (cookieBanner) {
+        var cookieRaf = window.requestAnimationFrame ? window.requestAnimationFrame(syncCookieLift) : null;
+        if (cookieRaf === null) syncCookieLift();
+      }
     }());
   </script>
   <script>
