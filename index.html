@@ -707,6 +707,21 @@
       body.cookie-up .wa-panel{bottom:calc(56px + env(safe-area-inset-bottom) + 12px + var(--cookie-lift,84px) + 10px + 50px + 12px);max-height:calc(100vh - 156px - var(--cookie-lift,84px))}
     }
     @media(prefers-reduced-motion:reduce){.wa-panel,.wa-panel-close,.wa-action,.wa-action span,.wa-panel-plain{transition:none}}
+    /* Phone-width launcher fit: the floating button and its panel are anchored
+       from the LEFT edge of the visible viewport (left:100vw) and shifted back
+       by their own width plus 16px, so the whole button always sits inside
+       the screen with a 16px right margin — even in embedded/webview contexts
+       where the fixed-position containing block is wider than the visible
+       viewport and a plain right offset would push the button off-screen.
+       Never clipped at the edge, never a source of horizontal scrolling, and
+       the stack keeps its existing clearance above the sticky mobile action
+       bar. */
+    @media(max-width:600px){
+      .whatsapp-float{left:100vw;right:auto;transform:translateX(calc(-100% - 16px));max-width:calc(100vw - 32px)}
+      .whatsapp-float:hover,.whatsapp-float:focus-visible{transform:translate(calc(-100% - 16px),-2px)}
+      .wa-panel{left:100vw;right:auto;transform:translate(calc(-100% - 16px),10px)}
+      .wa-panel.is-open{transform:translate(calc(-100% - 16px),0)}
+    }
     /* Light / dark theme toggle: dark (the original black-and-gold) stays the
        default. The light theme below applies only when the visitor picks it —
        the choice is stored on their device (localStorage "bae-theme") and
